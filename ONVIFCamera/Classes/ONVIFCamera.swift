@@ -70,7 +70,7 @@ enum CameraRequest {
 /** Main class of the pod, it alprofileslows us to connect to an ONVIF camera, retrieve informations, its media profiles and
  the stream URI.
  */
-public class ONVIFCamera {
+public class ONVIFCamera: NSObject, SOAPEngineDelegate {
     
     /**
      The state of the camera. The camera can be in these states, it helps us to keep track up to which state we have been.
@@ -265,6 +265,7 @@ public class ONVIFCamera {
     
         let soap = SOAPEngine()
         soap.licenseKey = soapEngineLicenseKey
+        soap.delegate = self
         soap.version = SOAPVersion.VERSION_1_2
         soap.authorizationMethod = SOAPAuthorization.AUTH_WSSECURITY
         
@@ -304,6 +305,14 @@ public class ONVIFCamera {
             print(error ?? "")
         }
         print("SOAP REQUEST: \(soap.soapActionRequest)")
+    }
+    
+    
+    public func soapEngine(_ soapEngine: SOAPEngine!, didBeforeSending request: NSMutableURLRequest!) -> NSMutableURLRequest! {
+        
+        let str = String(data: request.httpBody!, encoding: .utf8)!
+        print(str)
+        return request
     }
     
     /// returns the correct path depending on the service we're calling
